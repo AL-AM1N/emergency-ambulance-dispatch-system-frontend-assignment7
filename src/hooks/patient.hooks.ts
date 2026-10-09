@@ -43,6 +43,9 @@ export const useCancelEmergencyRequest = () => {
     onSuccess: () => {
       toast.success("Emergency request cancelled")
       queryClient.invalidateQueries({
+        queryKey: ["patient", "emergency-request"],
+      })
+      queryClient.invalidateQueries({
         queryKey: ["patient", "emergency-requests"],
       })
       queryClient.invalidateQueries({ queryKey: ["patient", "trips"] })

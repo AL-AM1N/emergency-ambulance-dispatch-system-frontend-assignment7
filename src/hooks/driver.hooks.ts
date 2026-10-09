@@ -62,6 +62,7 @@ export const useAcceptTrip = () => {
     mutationFn: (id: string) => DriverAPI.acceptTrip(id),
     onSuccess: (trip) => {
       queryClient.invalidateQueries({ queryKey: ["driver", "current-trip"] })
+      queryClient.invalidateQueries({ queryKey: ["driver", "trip"] })
       queryClient.invalidateQueries({ queryKey: ["driver", "trips"] })
       toast.success(`Trip #${trip.id.slice(0, 8)} accepted`)
     },
@@ -84,6 +85,7 @@ export const useUpdateTripStatus = () => {
     }) => DriverAPI.updateTripStatus(id, status),
     onSuccess: (trip) => {
       queryClient.invalidateQueries({ queryKey: ["driver", "current-trip"] })
+      queryClient.invalidateQueries({ queryKey: ["driver", "trip"] })
       queryClient.invalidateQueries({ queryKey: ["driver", "trips"] })
       toast.success(`Trip ${trip.status.toLowerCase().replace("_", " ")}`)
     },
