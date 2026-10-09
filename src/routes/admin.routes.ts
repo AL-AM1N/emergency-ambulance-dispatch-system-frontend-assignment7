@@ -7,6 +7,7 @@ export const ADMIN_ROUTES = {
   hospitals: "/admin/hospitals",
   payments: "/admin/payments",
   reports: "/admin/reports",
+  profile: "/admin/profile",
 } as const
 
 export const adminMenuItems = [

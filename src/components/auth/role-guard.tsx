@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { type ReactNode, useEffect } from "react"
+import { type ReactNode, useEffect, useState } from "react"
 import { useAuth } from "@/context/auth.context"
 import type { Role } from "@/types"
 import AccessDenied from "./access-denied"
@@ -16,6 +16,11 @@ export default function RoleGuard({
 }) {
   const router = useRouter()
   const { role, isAuthenticated, isLoading } = useAuth()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -23,7 +28,7 @@ export default function RoleGuard({
     }
   }, [isLoading, isAuthenticated, router])
 
-  if (isLoading) {
+  if (!mounted || isLoading) {
     return <AuthLoading />
   }
 

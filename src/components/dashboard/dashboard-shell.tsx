@@ -6,6 +6,7 @@ import type { ReactNode } from "react"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -18,13 +19,14 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/auth.context"
 import { useLogout } from "@/hooks/auth.hooks"
+import { ADMIN_ROUTES, DRIVER_ROUTES, PATIENT_ROUTES } from "@/routes"
 import type { Role } from "@/types"
 import { DashboardSidebar } from "./dashboard-sidebar"
 
 const profileHref: Record<Role, string> = {
-  ADMIN: "/admin/dashboard",
-  DRIVER: "/driver/profile",
-  PATIENT: "/patient/profile",
+  ADMIN: ADMIN_ROUTES.profile,
+  DRIVER: DRIVER_ROUTES.profile,
+  PATIENT: PATIENT_ROUTES.profile,
 }
 
 export default function DashboardShell({
@@ -64,22 +66,23 @@ export default function DashboardShell({
               }
             />
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">{user?.name}</span>
-                  <span className="text-xs font-normal text-muted-foreground">
-                    {user?.email}
-                  </span>
-                </div>
-              </DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{user?.name}</span>
+                    <span className="text-xs font-normal text-muted-foreground">
+                      {user?.email}
+                    </span>
+                  </div>
+                </DropdownMenuLabel>
+              </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem render={<Link href={profileHref[userRole]} />}>
                 <UserCircleIcon className="size-4" />
                 Profile
               </DropdownMenuItem>
               <DropdownMenuItem
-                onSelect={(event) => {
-                  event.preventDefault()
+                onClick={() => {
                   logout.mutate(undefined)
                 }}
               >
