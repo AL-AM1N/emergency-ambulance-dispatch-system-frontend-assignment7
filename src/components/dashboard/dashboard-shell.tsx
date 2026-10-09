@@ -1,6 +1,6 @@
 "use client"
 
-import { LogOutIcon, UserCircleIcon } from "lucide-react"
+import { ArrowLeftIcon, LogOutIcon, UserCircleIcon } from "lucide-react"
 import Link from "next/link"
 import type { ReactNode } from "react"
 import {
@@ -81,6 +81,11 @@ export default function DashboardShell({
                 <UserCircleIcon className="size-4" />
                 Profile
               </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/" />}>
+                <ArrowLeftIcon className="size-4" />
+                Back to site
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
                   logout.mutate(undefined)

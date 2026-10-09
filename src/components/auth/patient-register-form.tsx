@@ -3,7 +3,6 @@
 import { useForm } from "@tanstack/react-form"
 import { Loader2Icon, UserPlusIcon } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -20,7 +19,6 @@ import { roleHome } from "@/lib/auth"
 import { patientRegistrationSchema } from "@/validation"
 
 export function PatientRegisterForm() {
-  const router = useRouter()
   const registerPatient = useRegisterPatient()
 
   const form = useForm({
@@ -38,7 +36,7 @@ export function PatientRegisterForm() {
     onSubmit: async ({ value }) => {
       try {
         await registerPatient.mutateAsync(value)
-        router.replace(roleHome("PATIENT"))
+        window.location.assign(roleHome("PATIENT"))
       } catch {
         // Toast already shown by the hook.
       }

@@ -3,9 +3,11 @@
 import { MenuIcon, XIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Brand } from "@/components/brand/brand"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/context/auth.context"
+import { roleHome } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
@@ -19,7 +21,15 @@ const NAV_ITEMS = [
 
 export function Header() {
   const pathname = usePathname()
+  const { isAuthenticated, role } = useAuth()
+  const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const showDashboard = mounted && isAuthenticated && Boolean(role)
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
@@ -44,12 +54,20 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" size="sm" render={<Link href="/login" />}>
-            Log in
-          </Button>
-          <Button size="sm" render={<Link href="/register" />}>
-            Get Started
-          </Button>
+          {showDashboard ? (
+            <Button size="sm" render={<Link href={roleHome(role)} />}>
+              Dashboard
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" render={<Link href="/login" />}>
+                Log in
+              </Button>
+              <Button size="sm" render={<Link href="/register" />}>
+                Get Started
+              </Button>
+            </>
+          )}
         </div>
 
         <button
@@ -85,21 +103,33 @@ export function Header() {
               </Link>
             ))}
             <div className="mt-2 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                render={<Link href="/login" />}
-              >
-                Log in
-              </Button>
-              <Button
-                size="sm"
-                className="flex-1"
-                render={<Link href="/register" />}
-              >
-                Get Started
-              </Button>
+              {showDashboard ? (
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  render={<Link href={roleHome(role)} />}
+                >
+                  Dashboard
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    render={<Link href="/login" />}
+                  >
+                    Log in
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    render={<Link href="/register" />}
+                  >
+                    Get Started
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
         </div>

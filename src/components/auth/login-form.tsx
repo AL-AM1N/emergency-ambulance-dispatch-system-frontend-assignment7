@@ -4,7 +4,6 @@ import { GoogleLogin } from "@react-oauth/google"
 import { useForm } from "@tanstack/react-form"
 import { KeyRoundIcon, Loader2Icon, LockKeyholeIcon } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "react-hot-toast"
 import { Button } from "@/components/ui/button"
@@ -14,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { useGoogleLogin, useLogin } from "@/hooks"
-import { getStoredRole, roleHome } from "@/lib/auth"
+import { roleHome, tokenToRole } from "@/lib/auth"
 import { attemptDemoLogin } from "@/lib/demo"
 import type { DemoRole } from "@/types"
 import { loginSchema } from "@/validation"
@@ -44,7 +43,6 @@ const demoOptions: Array<{
 ]
 
 export function LoginForm() {
-  const router = useRouter()
   const login = useLogin()
   const googleLogin = useGoogleLogin()
   const [demoLoading, setDemoLoading] = useState<DemoRole | null>(null)
@@ -59,11 +57,11 @@ export function LoginForm() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await login.mutateAsync({
+        const result = await login.mutateAsync({
           email: value.email,
           password: value.password,
         })
-        router.replace(roleHome(getStoredRole()))
+        window.location.assign(roleHome(tokenToRole(result.accessToken)))
       } catch {
         // Toast already shown by the hook.
       }
@@ -76,7 +74,7 @@ export function LoginForm() {
       const result = await attemptDemoLogin(role)
       if (result.ok && result.home) {
         toast.success(`${role} demo session ready`)
-        router.replace(result.home)
+        window.location.assign(result.home)
       } else {
         toast.error(result.message ?? "Demo login failed")
       }
@@ -87,8 +85,8 @@ export function LoginForm() {
 
   const handleGoogleSuccess = async (credential: string) => {
     try {
-      await googleLogin.mutateAsync({ idToken: credential })
-      router.replace(roleHome(getStoredRole()))
+      const result = await googleLogin.mutateAsync({ idToken: credential })
+      window.location.assign(roleHome(tokenToRole(result.accessToken)))
     } catch {
       // Toast already shown by the hook.
     }

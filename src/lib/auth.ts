@@ -86,6 +86,13 @@ export function hasSession(): boolean {
   return Boolean(getAccessToken())
 }
 
+export function tokenToRole(token: string | undefined): Role | undefined {
+  if (!token) {
+    return undefined
+  }
+  return decodeJwt(token)?.role ?? getStoredRole()
+}
+
 export function roleHome(role: Role | undefined | null): string {
   switch (role) {
     case "ADMIN":

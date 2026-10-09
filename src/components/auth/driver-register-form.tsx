@@ -3,7 +3,6 @@
 import { useForm } from "@tanstack/react-form"
 import { AmbulanceIcon, Loader2Icon } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -28,7 +27,6 @@ const AMBULANCE_TYPE_OPTIONS: AmbulanceTypeName[] = [
 ]
 
 export function DriverRegisterForm() {
-  const router = useRouter()
   const registerDriver = useRegisterDriver()
 
   const form = useForm({
@@ -48,7 +46,7 @@ export function DriverRegisterForm() {
     onSubmit: async ({ value }) => {
       try {
         await registerDriver.mutateAsync(value)
-        router.replace(roleHome("DRIVER"))
+        window.location.assign(roleHome("DRIVER"))
       } catch {
         // Toast already shown by the hook.
       }
