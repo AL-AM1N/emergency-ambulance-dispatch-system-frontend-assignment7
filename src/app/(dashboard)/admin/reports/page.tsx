@@ -66,7 +66,7 @@ export default function AdminReportsPage() {
     })) ?? []
 
   const byStatus =
-    tripsReport?.summary.byStatus.map((entry) => ({
+    tripsReport?.summary?.byStatus.map((entry) => ({
       name: entry.status.replace("_", " "),
       value: entry._count._all,
     })) ?? []
@@ -133,7 +133,7 @@ export default function AdminReportsPage() {
         />
         <StatCard
           title="Total Trips"
-          value={tripsReport?.summary.total ?? 0}
+          value={tripsReport?.summary?.total ?? 0}
           icon={ActivityIcon}
         />
         <StatCard
@@ -271,7 +271,7 @@ export default function AdminReportsPage() {
             <div className="grid gap-2 sm:grid-cols-4">
               {TRIP_STATUSES.map((status) => {
                 const count =
-                  tripsReport?.summary.byStatus.find(
+                  tripsReport?.summary?.byStatus.find(
                     (entry) => entry.status === status,
                   )?._count._all ?? 0
                 return (

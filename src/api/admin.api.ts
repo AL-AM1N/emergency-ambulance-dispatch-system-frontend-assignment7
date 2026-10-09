@@ -259,26 +259,21 @@ const getDashboardStats = async () => {
 }
 
 const getReportsTrips = async (query: TripQuery = {}) => {
-  const res = await apiClient<
-    ApiResponse<EmergencyRequest[]> & { meta: Meta } & {
-      summary: TripReportResponse["summary"]
-    }
-  >("/admin/reports/trips", {
-    params: {
-      page: query.page ?? 1,
-      limit: query.limit ?? 10,
-      sortBy: query.sortBy ?? "createdAt",
-      sortOrder: query.sortOrder ?? "desc",
-      status: query.status,
-      startDate: query.startDate,
-      endDate: query.endDate,
+  const res = await apiClient<ApiResponse<TripReportResponse>>(
+    "/admin/reports/trips",
+    {
+      params: {
+        page: query.page ?? 1,
+        limit: query.limit ?? 10,
+        sortBy: query.sortBy ?? "createdAt",
+        sortOrder: query.sortOrder ?? "desc",
+        status: query.status,
+        startDate: query.startDate,
+        endDate: query.endDate,
+      },
     },
-  })
-  return {
-    result: res.data,
-    meta: res.meta,
-    summary: res.summary,
-  } satisfies TripReportResponse
+  )
+  return res.data
 }
 
 const getReportsRevenue = async (
