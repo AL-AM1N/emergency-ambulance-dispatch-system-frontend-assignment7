@@ -17,6 +17,18 @@ export interface ApiClientError {
   data?: unknown
 }
 
+export class ApiError extends Error {
+  status: number
+  data?: unknown
+
+  constructor({ status, message, data }: ApiClientError) {
+    super(message)
+    this.name = "ApiError"
+    this.status = status
+    this.data = data
+  }
+}
+
 const rawClient = ofetch.create({
   baseURL: BASE_URL,
   credentials: "include",
@@ -126,7 +138,7 @@ export async function apiClient<T>(
       }
     }
 
-    throw error
+    throw new ApiError(apiError)
   }
 }
 

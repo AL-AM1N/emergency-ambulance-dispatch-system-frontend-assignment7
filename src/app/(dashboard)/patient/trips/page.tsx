@@ -130,6 +130,7 @@ function TripsView() {
                       <TableCell>{formatDateTime(trip.completedAt)}</TableCell>
                       <TableCell className="flex justify-end gap-1">
                         {trip.status === "COMPLETED" &&
+                          Boolean(trip.fare) &&
                           !(
                             trip.payment && trip.payment.status === "COMPLETED"
                           ) && (

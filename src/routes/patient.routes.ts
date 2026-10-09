@@ -3,6 +3,7 @@ export const PATIENT_ROUTES = {
   requests: "/patient/requests",
   newRequest: "/patient/requests/new",
   payment: "/patient/payment",
+  paymentReturn: "/patient/payment/return",
   trips: "/patient/trips",
   profile: "/patient/profile",
 } as const

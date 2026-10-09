@@ -8,6 +8,7 @@ import {
 } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import {
+  AlertCircleIcon,
   ArrowLeftIcon,
   BanknoteIcon,
   CheckCircle2Icon,
@@ -16,7 +17,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "react-hot-toast"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -54,6 +55,9 @@ function CheckoutForm({
     setSubmitting(true)
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
+      confirmParams: {
+        return_url: `${window.location.origin}${PATIENT_ROUTES.paymentReturn}?tripId=${tripId}`,
+      },
       redirect: "if_required",
     })
 
@@ -112,36 +116,66 @@ function PaymentView() {
   const searchParams = useSearchParams()
   const tripId = searchParams.get("tripId") ?? ""
   const { data: trip, isLoading, isError } = useGetTripById(tripId)
-  const createPayment = useCreatePayment()
+  const { mutate: createIntent } = useCreatePayment()
+  const startedRef = useRef(false)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [intentError, setIntentError] = useState<string | null>(null)
   const [paid, setPaid] = useState(false)
 
-  useEffect(() => {
-    if (!trip || paid) {
+  const startPayment = useCallback(() => {
+    if (!stripePromise || !trip || paid || startedRef.current) {
       return
     }
     if (trip.payment?.status === "COMPLETED") {
       setPaid(true)
       return
     }
-    let active = true
-    setClientSecret(null)
-    createPayment
-      .mutateAsync({ tripId: trip.id, method: "STRIPE" })
-      .then((res) => {
-        if (active && res.clientSecret) {
-          setClientSecret(res.clientSecret)
-        } else if (active) {
-          setPaid(true)
-        }
-      })
-      .catch(() => {
-        // Toast already shown.
-      })
-    return () => {
-      active = false
+    if (
+      trip.status !== "COMPLETED" ||
+      trip.fare === null ||
+      trip.fare === undefined
+    ) {
+      return
     }
-  }, [trip?.id, trip?.payment?.status, createPayment, paid, trip])
+
+    startedRef.current = true
+    createIntent(
+      { tripId: trip.id, method: "STRIPE" },
+      {
+        onSuccess: (res) => {
+          if (res.clientSecret) {
+            setClientSecret(res.clientSecret)
+          } else {
+            setPaid(true)
+          }
+        },
+        onError: (error) => {
+          setIntentError(
+            error instanceof Error
+              ? error.message
+              : "Could not start the payment.",
+          )
+        },
+      },
+    )
+  }, [createIntent, paid, trip])
+
+  useEffect(() => {
+    startPayment()
+  }, [startPayment])
+
+  const paymentUnavailable =
+    Boolean(trip) &&
+    trip?.payment?.status !== "COMPLETED" &&
+    (trip?.status !== "COMPLETED" ||
+      trip?.fare === null ||
+      trip?.fare === undefined)
+
+  const handleRetry = () => {
+    startedRef.current = false
+    setIntentError(null)
+    startPayment()
+  }
 
   if (!tripId) {
     return (
@@ -163,7 +197,47 @@ function PaymentView() {
     )
   }
 
-  if (isLoading || (trip && !clientSecret && !paid)) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+        <Loader2Icon className="size-4 animate-spin" /> Preparing checkout…
+      </div>
+    )
+  }
+
+  if (paymentUnavailable) {
+    return (
+      <EmptyState
+        icon={SirenIcon}
+        title="Payment not available yet"
+        description={
+          trip?.fare === null || trip?.fare === undefined
+            ? "The fare for this trip has not been generated yet. Please try again later."
+            : "Payment can only be made once the trip has been completed."
+        }
+      />
+    )
+  }
+
+  if (intentError) {
+    return (
+      <div className="mx-auto max-w-md">
+        <PageHeader title="Payment" />
+        <Card>
+          <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
+            <AlertCircleIcon className="size-10 text-destructive" />
+            <p className="font-medium">Could not start the payment</p>
+            <p className="text-sm text-muted-foreground">{intentError}</p>
+            <Button size="sm" onClick={handleRetry}>
+              Try again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (trip && stripePromise && !clientSecret && !paid) {
     return (
       <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
         <Loader2Icon className="size-4 animate-spin" /> Preparing checkout…
