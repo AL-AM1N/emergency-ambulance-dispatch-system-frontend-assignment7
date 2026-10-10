@@ -1,11 +1,12 @@
 "use client"
 
-import { Loader2Icon, SirenIcon } from "lucide-react"
+import { SirenIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
 import { EmptyState } from "@/components/shared/empty-state"
+import { TableSkeleton } from "@/components/shared/skeletons"
 import {
   PriorityBadge,
   TripStatusBadge,
@@ -109,11 +110,7 @@ function RequestsView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && (
-            <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-              <Loader2Icon className="size-4 animate-spin" /> Loading requests…
-            </div>
-          )}
+          {isLoading && <TableSkeleton columns={7} />}
 
           {!isLoading && isError && (
             <div className="p-6">

@@ -13,6 +13,7 @@ import { Suspense, useState } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { EmptyState } from "@/components/shared/empty-state"
+import { TableSkeleton } from "@/components/shared/skeletons"
 import { AmbulanceStatusBadge } from "@/components/shared/status-badge"
 import TablePagination from "@/components/shared/table-pagination"
 import { Button } from "@/components/ui/button"
@@ -286,12 +287,7 @@ function AmbulancesView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && (
-            <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-              <Loader2Icon className="size-4 animate-spin" /> Loading
-              ambulances…
-            </div>
-          )}
+          {isLoading && <TableSkeleton columns={6} />}
 
           {!isLoading && isError && (
             <div className="p-6">

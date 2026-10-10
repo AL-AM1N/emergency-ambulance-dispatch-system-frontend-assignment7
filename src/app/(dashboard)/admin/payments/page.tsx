@@ -1,16 +1,12 @@
 "use client"
 
-import {
-  BanknoteIcon,
-  CreditCardIcon,
-  Loader2Icon,
-  ReceiptIcon,
-} from "lucide-react"
+import { BanknoteIcon, CreditCardIcon, ReceiptIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
 import { EmptyState } from "@/components/shared/empty-state"
+import { StatCardsSkeleton, TableSkeleton } from "@/components/shared/skeletons"
 import { StatCard } from "@/components/shared/stat-card"
 import { PaymentStatusBadge } from "@/components/shared/status-badge"
 import TablePagination from "@/components/shared/table-pagination"
@@ -54,33 +50,32 @@ function PaymentsView() {
         description="Review payments collected across completed trips."
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard
-          title="Revenue (all time)"
-          value={formatCurrency(revenue?.totalRevenue ?? 0)}
-          icon={BanknoteIcon}
-        />
-        <StatCard
-          title="Transactions (all time)"
-          value={revenue?.totalTransactions ?? 0}
-          icon={ReceiptIcon}
-        />
-        <StatCard
-          title="Collected (this page)"
-          value={formatCurrency(totalPaid)}
-          icon={CreditCardIcon}
-        />
-      </div>
+      {isLoading ? (
+        <StatCardsSkeleton count={3} className="grid gap-4 sm:grid-cols-3" />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StatCard
+            title="Revenue (all time)"
+            value={formatCurrency(revenue?.totalRevenue ?? 0)}
+            icon={BanknoteIcon}
+          />
+          <StatCard
+            title="Transactions (all time)"
+            value={revenue?.totalTransactions ?? 0}
+            icon={ReceiptIcon}
+          />
+          <StatCard
+            title="Collected (this page)"
+            value={formatCurrency(totalPaid)}
+            icon={CreditCardIcon}
+          />
+        </div>
+      )}
 
       <div className="mt-4">
         <Card>
           <CardContent className="p-0">
-            {isLoading && (
-              <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-                <Loader2Icon className="size-4 animate-spin" /> Loading
-                payments…
-              </div>
-            )}
+            {isLoading && <TableSkeleton columns={7} />}
 
             {!isLoading && isError && (
               <div className="p-6">

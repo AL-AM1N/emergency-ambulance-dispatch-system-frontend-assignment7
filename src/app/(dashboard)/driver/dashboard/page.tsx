@@ -12,6 +12,11 @@ import {
 import Link from "next/link"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
+import {
+  CardSkeleton,
+  StatCardsSkeleton,
+  TableSkeleton,
+} from "@/components/shared/skeletons"
 import { StatCard } from "@/components/shared/stat-card"
 import { TripStatusBadge } from "@/components/shared/status-badge"
 import { Button } from "@/components/ui/button"
@@ -52,14 +57,7 @@ function CurrentTripCard() {
   const updateStatus = useUpdateTripStatus()
 
   if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-          <Loader2Icon className="size-4 animate-spin" /> Checking for active
-          trips…
-        </CardContent>
-      </Card>
-    )
+    return <CardSkeleton lines={5} />
   }
 
   if (!trip) {
@@ -176,28 +174,32 @@ export default function DriverDashboardPage() {
         description="Monitor your availability and active assignments."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="My Trips"
-          value={tripsData?.meta.total ?? 0}
-          icon={RouteIcon}
-        />
-        <StatCard
-          title="Completed"
-          value={trips.filter((trip) => trip.status === "COMPLETED").length}
-          icon={CheckCircle2Icon}
-        />
-        <StatCard
-          title="Vehicle"
-          value={profile?.vehicleNumber ?? "—"}
-          icon={AmbulanceIcon}
-        />
-        <StatCard
-          title="Availability"
-          value={profile?.isAvailable ? "Online" : "Offline"}
-          icon={UserRoundIcon}
-        />
-      </div>
+      {tripsLoading ? (
+        <StatCardsSkeleton count={4} />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="My Trips"
+            value={tripsData?.meta.total ?? 0}
+            icon={RouteIcon}
+          />
+          <StatCard
+            title="Completed"
+            value={trips.filter((trip) => trip.status === "COMPLETED").length}
+            icon={CheckCircle2Icon}
+          />
+          <StatCard
+            title="Vehicle"
+            value={profile?.vehicleNumber ?? "—"}
+            icon={AmbulanceIcon}
+          />
+          <StatCard
+            title="Availability"
+            value={profile?.isAvailable ? "Online" : "Offline"}
+            icon={UserRoundIcon}
+          />
+        </div>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
@@ -241,11 +243,7 @@ export default function DriverDashboardPage() {
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              {tripsLoading && (
-                <p className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-                  <Loader2Icon className="size-4 animate-spin" /> Loading…
-                </p>
-              )}
+              {tripsLoading && <TableSkeleton columns={3} rows={3} />}
               {!tripsLoading && trips.length === 0 && (
                 <div className="p-4">
                   <EmptyState

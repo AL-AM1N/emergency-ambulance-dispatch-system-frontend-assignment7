@@ -25,6 +25,7 @@ import {
 } from "recharts"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
+import { StatCardsSkeleton } from "@/components/shared/skeletons"
 import { StatCard } from "@/components/shared/stat-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -54,13 +55,7 @@ export default function AdminDashboardPage() {
   }
 
   if (isLoading || !stats) {
-    return (
-      <div className="grid gap-4 md:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="h-32 animate-pulse rounded-xl bg-muted" />
-        ))}
-      </div>
-    )
+    return <StatCardsSkeleton count={4} className="grid gap-4 md:grid-cols-4" />
   }
 
   const ambulanceData = [

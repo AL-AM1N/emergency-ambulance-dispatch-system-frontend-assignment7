@@ -10,6 +10,7 @@ import {
   UserRoundIcon,
 } from "lucide-react"
 import { PageHeader } from "@/components/dashboard/page-header"
+import { CardSkeleton } from "@/components/shared/skeletons"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { useGetDriverProfile, useUpdateAvailability } from "@/hooks"
@@ -21,7 +22,9 @@ export default function DriverProfilePage() {
 
   if (isLoading || !profile) {
     return (
-      <div className="grid h-64 animate-pulse place-items-center rounded-xl bg-muted" />
+      <div className="mx-auto max-w-2xl">
+        <CardSkeleton lines={4} />
+      </div>
     )
   }
 

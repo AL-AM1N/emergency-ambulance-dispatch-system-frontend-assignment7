@@ -5,13 +5,13 @@ import {
   ArrowRightIcon,
   CheckCircle2Icon,
   Clock3Icon,
-  Loader2Icon,
   PlusIcon,
   SirenIcon,
 } from "lucide-react"
 import Link from "next/link"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
+import { StatCardsSkeleton, TableSkeleton } from "@/components/shared/skeletons"
 import { StatCard } from "@/components/shared/stat-card"
 import {
   PriorityBadge,
@@ -52,34 +52,42 @@ export default function PatientDashboardPage() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Trips"
-          value={data?.meta.total ?? 0}
-          icon={SirenIcon}
-        />
-        <StatCard
-          title="Active"
-          value={
-            trips.filter((trip) =>
-              [
-                "ASSIGNED",
-                "ACCEPTED",
-                "EN_ROUTE",
-                "PICKED_UP",
-                "HOSPITAL_ARRIVED",
-              ].includes(trip.status),
-            ).length
-          }
-          icon={AmbulanceIcon}
-        />
-        <StatCard title="Completed" value={completed} icon={CheckCircle2Icon} />
-        <StatCard
-          title="Pending"
-          value={trips.filter((trip) => trip.status === "PENDING").length}
-          icon={Clock3Icon}
-        />
-      </div>
+      {isLoading ? (
+        <StatCardsSkeleton count={4} />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Total Trips"
+            value={data?.meta.total ?? 0}
+            icon={SirenIcon}
+          />
+          <StatCard
+            title="Active"
+            value={
+              trips.filter((trip) =>
+                [
+                  "ASSIGNED",
+                  "ACCEPTED",
+                  "EN_ROUTE",
+                  "PICKED_UP",
+                  "HOSPITAL_ARRIVED",
+                ].includes(trip.status),
+              ).length
+            }
+            icon={AmbulanceIcon}
+          />
+          <StatCard
+            title="Completed"
+            value={completed}
+            icon={CheckCircle2Icon}
+          />
+          <StatCard
+            title="Pending"
+            value={trips.filter((trip) => trip.status === "PENDING").length}
+            icon={Clock3Icon}
+          />
+        </div>
+      )}
 
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between">
@@ -94,11 +102,7 @@ export default function PatientDashboardPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          {isLoading && (
-            <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-              <Loader2Icon className="size-4 animate-spin" /> Loading trips…
-            </div>
-          )}
+          {isLoading && <TableSkeleton columns={6} />}
 
           {!isLoading && isError && (
             <EmptyState

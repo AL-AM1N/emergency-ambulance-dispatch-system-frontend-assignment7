@@ -2,7 +2,6 @@
 
 import {
   BanknoteIcon,
-  Loader2Icon,
   MapPinIcon,
   PhoneCallIcon,
   SirenIcon,
@@ -15,6 +14,7 @@ import { useState } from "react"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { EmptyState } from "@/components/shared/empty-state"
+import { CardSkeleton } from "@/components/shared/skeletons"
 import {
   PaymentStatusBadge,
   PriorityBadge,
@@ -69,11 +69,7 @@ export default function PatientRequestDetailPage() {
         description={trip ? `Request #${shortId(trip.id)}` : undefined}
       />
 
-      {isLoading && (
-        <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-          <Loader2Icon className="size-4 animate-spin" /> Loading request…
-        </div>
-      )}
+      {isLoading && <CardSkeleton lines={6} />}
 
       {!isLoading && isError && (
         <EmptyState

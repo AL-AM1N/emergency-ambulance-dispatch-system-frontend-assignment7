@@ -21,6 +21,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "react-hot-toast"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
 import { EmptyState } from "@/components/shared/empty-state"
+import { CardSkeleton } from "@/components/shared/skeletons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useConfirmPayment, useCreatePayment, useGetTripById } from "@/hooks"
@@ -198,11 +199,7 @@ function PaymentView() {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-        <Loader2Icon className="size-4 animate-spin" /> Preparing checkout…
-      </div>
-    )
+    return <CardSkeleton lines={6} className="mx-auto max-w-md" />
   }
 
   if (paymentUnavailable) {
@@ -238,11 +235,7 @@ function PaymentView() {
   }
 
   if (trip && stripePromise && !clientSecret && !paid) {
-    return (
-      <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-        <Loader2Icon className="size-4 animate-spin" /> Preparing checkout…
-      </div>
-    )
+    return <CardSkeleton lines={4} className="mx-auto max-w-md" />
   }
 
   return (

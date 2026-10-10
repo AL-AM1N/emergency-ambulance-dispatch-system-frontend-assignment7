@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
 import { EmptyState } from "@/components/shared/empty-state"
+import { TableSkeleton } from "@/components/shared/skeletons"
 import TablePagination from "@/components/shared/table-pagination"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -197,11 +198,7 @@ function DriversView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && (
-            <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-              <Loader2Icon className="size-4 animate-spin" /> Loading drivers…
-            </div>
-          )}
+          {isLoading && <TableSkeleton columns={6} />}
 
           {!isLoading && isError && (
             <div className="p-6">

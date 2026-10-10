@@ -3,7 +3,6 @@
 import {
   ArrowRightIcon,
   CheckCircle2Icon,
-  Loader2Icon,
   MapPinIcon,
   PhoneCallIcon,
   RouteIcon,
@@ -14,6 +13,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
+import { CardSkeleton } from "@/components/shared/skeletons"
 import { TripStatusBadge } from "@/components/shared/status-badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -51,11 +51,7 @@ export default function DriverTripDetailPage() {
         description={trip ? `Trip #${shortId(trip.id)}` : undefined}
       />
 
-      {isLoading && (
-        <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-          <Loader2Icon className="size-4 animate-spin" /> Loading trip…
-        </div>
-      )}
+      {isLoading && <CardSkeleton lines={6} />}
 
       {!isLoading && isError && (
         <EmptyState

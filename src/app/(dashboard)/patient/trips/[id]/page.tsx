@@ -2,7 +2,6 @@
 
 import {
   BanknoteIcon,
-  Loader2Icon,
   MapPinIcon,
   PhoneCallIcon,
   SirenIcon,
@@ -13,6 +12,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
+import { CardSkeleton } from "@/components/shared/skeletons"
 import {
   PaymentStatusBadge,
   PriorityBadge,
@@ -39,11 +39,7 @@ export default function PatientTripDetailPage() {
         description={trip ? `Trip #${shortId(trip.id)}` : undefined}
       />
 
-      {isLoading && (
-        <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-          <Loader2Icon className="size-4 animate-spin" /> Loading trip…
-        </div>
-      )}
+      {isLoading && <CardSkeleton lines={6} />}
 
       {!isLoading && isError && (
         <EmptyState

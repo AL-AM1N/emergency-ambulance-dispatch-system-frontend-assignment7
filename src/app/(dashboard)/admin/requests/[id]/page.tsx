@@ -3,7 +3,6 @@
 import {
   AmbulanceIcon,
   HospitalIcon,
-  Loader2Icon,
   MapPinIcon,
   PhoneCallIcon,
   SirenIcon,
@@ -14,6 +13,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
+import { CardSkeleton } from "@/components/shared/skeletons"
 import {
   PriorityBadge,
   TripStatusBadge,
@@ -82,11 +82,7 @@ export default function AdminRequestDetailPage() {
         }
       />
 
-      {isLoading && (
-        <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-          <Loader2Icon className="size-4 animate-spin" /> Loading request…
-        </div>
-      )}
+      {isLoading && <CardSkeleton lines={6} />}
 
       {!isLoading && isError && (
         <EmptyState
