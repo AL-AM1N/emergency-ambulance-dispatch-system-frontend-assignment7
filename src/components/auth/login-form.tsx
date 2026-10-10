@@ -2,7 +2,14 @@
 
 import { GoogleLogin } from "@react-oauth/google"
 import { useForm } from "@tanstack/react-form"
-import { KeyRoundIcon, Loader2Icon, LockKeyholeIcon } from "lucide-react"
+import {
+  AmbulanceIcon,
+  KeyRoundIcon,
+  Loader2Icon,
+  LockKeyholeIcon,
+  ShieldCheckIcon,
+  UserRoundIcon,
+} from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "react-hot-toast"
@@ -24,21 +31,25 @@ const demoOptions: Array<{
   role: DemoRole
   label: string
   description: string
+  icon: typeof ShieldCheckIcon
 }> = [
   {
     role: "ADMIN",
     label: "Admin",
     description: "Dispatch center",
+    icon: ShieldCheckIcon,
   },
   {
     role: "DRIVER",
     label: "Driver",
     description: "Ambulance operator",
+    icon: AmbulanceIcon,
   },
   {
     role: "PATIENT",
     label: "Patient",
     description: "Request emergency help",
+    icon: UserRoundIcon,
   },
 ]
 
@@ -210,35 +221,45 @@ export function LoginForm() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">One-click demo access</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {demoOptions.map((option) => (
-            <Button
-              key={option.role}
-              variant="outline"
-              className="w-full justify-between"
-              disabled={demoLoading !== null}
-              onClick={() => void handleDemoLogin(option.role)}
-            >
-              <span className="flex flex-col items-start">
-                <span className="text-sm font-medium">{option.label}</span>
-                <span className="text-xs text-muted-foreground">
-                  {option.description}
-                </span>
-              </span>
-              {demoLoading === option.role && (
-                <Loader2Icon className="size-4 animate-spin" />
-              )}
-            </Button>
-          ))}
-          <p className="pt-1 text-xs text-muted-foreground">
+      <div className="relative overflow-hidden rounded-xl border border-white/30 bg-gradient-to-br from-red-500/10 via-orange-400/10 to-rose-500/10 p-4 shadow-sm backdrop-blur-md dark:border-white/10">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-12 -left-10 size-32 rounded-full bg-red-500/30 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-10 -bottom-14 size-36 rounded-full bg-orange-400/30 blur-3xl"
+        />
+
+        <div className="relative">
+          <p className="mb-3 text-sm font-medium">One-click demo access</p>
+          <div className="grid grid-cols-3 gap-2">
+            {demoOptions.map((option) => {
+              const Icon = option.icon
+              return (
+                <Button
+                  key={option.role}
+                  variant="ghost"
+                  title={option.description}
+                  className="h-auto flex-col gap-1.5 border border-white/30 bg-white/20 py-3 text-foreground shadow-sm backdrop-blur-md hover:bg-white/30 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                  disabled={demoLoading !== null}
+                  onClick={() => void handleDemoLogin(option.role)}
+                >
+                  {demoLoading === option.role ? (
+                    <Loader2Icon className="size-4 animate-spin" />
+                  ) : (
+                    <Icon className="size-4 text-red-600" />
+                  )}
+                  <span className="text-xs font-medium">{option.label}</span>
+                </Button>
+              )
+            })}
+          </div>
+          <p className="pt-3 text-xs text-muted-foreground">
             Demo logins are auto-provisioned on first use.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
