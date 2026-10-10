@@ -1,7 +1,8 @@
 "use client"
 
-import { Loader2Icon, PhoneCall, ShieldAlertIcon } from "lucide-react"
+import { PhoneCall, ShieldAlertIcon } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useGetEmergencyInfo } from "@/hooks"
 import { formatPhone } from "@/lib/format"
 
@@ -10,9 +11,18 @@ export function EmergencyStrip() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-        <Loader2Icon className="size-4 animate-spin" /> Loading emergency
-        information…
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Card key={index}>
+            <CardContent className="flex items-center gap-3 p-5">
+              <Skeleton className="size-11 shrink-0 rounded-full" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     )
   }
@@ -31,9 +41,7 @@ export function EmergencyStrip() {
     )
   }
 
-  const primaryContacts = data.contacts.filter(
-    (contact) => contact.isActive && contact.type === "EMERGENCY",
-  )
+  const primaryContacts = data.contacts.filter((contact) => contact.isActive)
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

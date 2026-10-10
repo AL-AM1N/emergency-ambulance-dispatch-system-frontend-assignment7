@@ -9,6 +9,7 @@ import {
   RadioIcon,
   UsersIcon,
 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { EmergencyStrip } from "@/components/landing/emergency-strip"
 import { Button } from "@/components/ui/button"
@@ -64,23 +65,31 @@ const steps = [
 export default function HomePage() {
   return (
     <div>
-      <section className="relative overflow-hidden bg-gradient-to-b from-red-50 to-background">
-        <div className="mx-auto max-w-6xl px-4 py-20 lg:py-28">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-background px-4 py-1.5 text-sm font-medium text-muted-foreground">
+      <section className="relative isolate overflow-hidden bg-gradient-to-b from-red-50 to-background">
+        <Image
+          src="/hero-section.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover -z-10"
+        />
+        <div className="mx-auto flex min-h-[80vh] max-w-6xl items-center px-4 py-20 lg:py-28">
+          <div className="max-w-xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary bg-background px-4 py-1.5 text-sm font-medium text-muted-foreground">
               <BadgeCheckIcon className="size-4 text-red-600" />
               Trusted Emergency Dispatch Platform
             </div>
-            <h1 className="text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
               Emergency care,
               <span className="text-red-600"> dispatched in minutes.</span>
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
+            <p className="mt-6 max-w-2xl text-sm text-muted-foreground">
               AmbuLink connects you with the nearest available ambulance, live
               tracking, and priority handling — so you can focus on what matters
               most.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
                 size="lg"
                 className="w-full sm:w-auto"
