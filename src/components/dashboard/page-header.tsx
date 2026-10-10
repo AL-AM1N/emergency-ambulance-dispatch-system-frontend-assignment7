@@ -1,4 +1,8 @@
+"use client"
+
+import { motion } from "motion/react"
 import type { ReactNode } from "react"
+import { fadeInDown } from "@/lib/motion"
 
 export function PageHeader({
   title,
@@ -10,7 +14,12 @@ export function PageHeader({
   actions?: ReactNode
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <motion.div
+      variants={fadeInDown}
+      initial="hidden"
+      animate="visible"
+      className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    >
       <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
         {description && (
@@ -18,6 +27,6 @@ export function PageHeader({
         )}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
-    </div>
+    </motion.div>
   )
 }

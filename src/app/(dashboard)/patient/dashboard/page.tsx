@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { PageHeader } from "@/components/dashboard/page-header"
+import { ContentSwap, Stagger, StaggerItem } from "@/components/motion"
 import { EmptyState } from "@/components/shared/empty-state"
 import { StatCardsSkeleton, TableSkeleton } from "@/components/shared/skeletons"
 import { StatCard } from "@/components/shared/stat-card"
@@ -39,6 +40,14 @@ export default function PatientDashboardPage() {
     ["COMPLETED", "HOSPITAL_ARRIVED"].includes(trip.status),
   ).length
 
+  const tableState = isLoading
+    ? "loading"
+    : isError
+      ? "error"
+      : trips.length === 0
+        ? "empty"
+        : "ready"
+
   return (
     <div>
       <PageHeader
@@ -52,42 +61,52 @@ export default function PatientDashboardPage() {
         }
       />
 
-      {isLoading ? (
-        <StatCardsSkeleton count={4} />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            title="Total Trips"
-            value={data?.meta.total ?? 0}
-            icon={SirenIcon}
-          />
-          <StatCard
-            title="Active"
-            value={
-              trips.filter((trip) =>
-                [
-                  "ASSIGNED",
-                  "ACCEPTED",
-                  "EN_ROUTE",
-                  "PICKED_UP",
-                  "HOSPITAL_ARRIVED",
-                ].includes(trip.status),
-              ).length
-            }
-            icon={AmbulanceIcon}
-          />
-          <StatCard
-            title="Completed"
-            value={completed}
-            icon={CheckCircle2Icon}
-          />
-          <StatCard
-            title="Pending"
-            value={trips.filter((trip) => trip.status === "PENDING").length}
-            icon={Clock3Icon}
-          />
-        </div>
-      )}
+      <ContentSwap stateKey={isLoading ? "loading" : "ready"}>
+        {isLoading ? (
+          <StatCardsSkeleton count={4} />
+        ) : (
+          <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StaggerItem>
+              <StatCard
+                title="Total Trips"
+                value={data?.meta.total ?? 0}
+                icon={SirenIcon}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <StatCard
+                title="Active"
+                value={
+                  trips.filter((trip) =>
+                    [
+                      "ASSIGNED",
+                      "ACCEPTED",
+                      "EN_ROUTE",
+                      "PICKED_UP",
+                      "HOSPITAL_ARRIVED",
+                    ].includes(trip.status),
+                  ).length
+                }
+                icon={AmbulanceIcon}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <StatCard
+                title="Completed"
+                value={completed}
+                icon={CheckCircle2Icon}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <StatCard
+                title="Pending"
+                value={trips.filter((trip) => trip.status === "PENDING").length}
+                icon={Clock3Icon}
+              />
+            </StaggerItem>
+          </Stagger>
+        )}
+      </ContentSwap>
 
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between">
@@ -102,68 +121,70 @@ export default function PatientDashboardPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          {isLoading && <TableSkeleton columns={6} />}
+          <ContentSwap stateKey={tableState}>
+            {isLoading && <TableSkeleton columns={6} />}
 
-          {!isLoading && isError && (
-            <EmptyState
-              icon={SirenIcon}
-              title="Could not load trips"
-              description="Please try refreshing the page."
-            />
-          )}
+            {!isLoading && isError && (
+              <EmptyState
+                icon={SirenIcon}
+                title="Could not load trips"
+                description="Please try refreshing the page."
+              />
+            )}
 
-          {!isLoading && !isError && trips.length === 0 && (
-            <EmptyState
-              icon={SirenIcon}
-              title="No trips yet"
-              description="When you request an ambulance, your trips will appear here."
-            />
-          )}
+            {!isLoading && !isError && trips.length === 0 && (
+              <EmptyState
+                icon={SirenIcon}
+                title="No trips yet"
+                description="When you request an ambulance, your trips will appear here."
+              />
+            )}
 
-          {!isLoading && !isError && trips.length > 0 && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Requested</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {trips.map((trip) => (
-                  <TableRow key={trip.id}>
-                    <TableCell className="font-mono text-xs">
-                      {shortId(trip.id)}
-                    </TableCell>
-                    <TableCell>
-                      {trip.emergencyType.replace("_", " ")}
-                    </TableCell>
-                    <TableCell>
-                      <PriorityBadge priority={trip.priority} />
-                    </TableCell>
-                    <TableCell>
-                      <TripStatusBadge status={trip.status} />
-                    </TableCell>
-                    <TableCell>{formatDateTime(trip.createdAt)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        render={
-                          <Link href={`${PATIENT_ROUTES.trips}/${trip.id}`} />
-                        }
-                      >
-                        View
-                      </Button>
-                    </TableCell>
+            {!isLoading && !isError && trips.length > 0 && (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Requested</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+                </TableHeader>
+                <TableBody>
+                  {trips.map((trip) => (
+                    <TableRow key={trip.id}>
+                      <TableCell className="font-mono text-xs">
+                        {shortId(trip.id)}
+                      </TableCell>
+                      <TableCell>
+                        {trip.emergencyType.replace("_", " ")}
+                      </TableCell>
+                      <TableCell>
+                        <PriorityBadge priority={trip.priority} />
+                      </TableCell>
+                      <TableCell>
+                        <TripStatusBadge status={trip.status} />
+                      </TableCell>
+                      <TableCell>{formatDateTime(trip.createdAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          render={
+                            <Link href={`${PATIENT_ROUTES.trips}/${trip.id}`} />
+                          }
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </ContentSwap>
         </CardContent>
       </Card>
     </div>

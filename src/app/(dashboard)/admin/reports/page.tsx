@@ -21,6 +21,7 @@ import {
   YAxis,
 } from "recharts"
 import { PageHeader } from "@/components/dashboard/page-header"
+import { Stagger, StaggerItem } from "@/components/motion"
 import { EmptyState } from "@/components/shared/empty-state"
 import { StatCard } from "@/components/shared/stat-card"
 import { Button } from "@/components/ui/button"
@@ -120,32 +121,41 @@ export default function AdminReportsPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Revenue"
-          value={formatCurrency(revenue?.totalRevenue ?? 0)}
-          icon={BanknoteIcon}
-        />
-        <StatCard
-          title="Transactions"
-          value={revenue?.totalTransactions ?? 0}
-          icon={BarChart3Icon}
-        />
-        <StatCard
-          title="Total Trips"
-          value={tripsReport?.summary?.total ?? 0}
-          icon={ActivityIcon}
-        />
-        <StatCard
-          title="Period"
-          value={
-            revenue?.period.startDate
-              ? `${revenue.period.startDate?.slice(5) ?? "—"} – ${revenue.period.endDate?.slice(5) ?? "now"}`
-              : "All time"
-          }
-          icon={FileBarChartIcon}
-        />
-      </div>
+      <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StaggerItem>
+          <StatCard
+            title="Revenue"
+            value={revenue?.totalRevenue ?? 0}
+            icon={BanknoteIcon}
+            format={formatCurrency}
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            title="Transactions"
+            value={revenue?.totalTransactions ?? 0}
+            icon={BarChart3Icon}
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            title="Total Trips"
+            value={tripsReport?.summary?.total ?? 0}
+            icon={ActivityIcon}
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            title="Period"
+            value={
+              revenue?.period.startDate
+                ? `${revenue.period.startDate?.slice(5) ?? "—"} – ${revenue.period.endDate?.slice(5) ?? "now"}`
+                : "All time"
+            }
+            icon={FileBarChartIcon}
+          />
+        </StaggerItem>
+      </Stagger>
 
       <div className="mt-6 space-y-6">
         <Card>

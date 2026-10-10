@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
+import { ContentSwap, Stagger, StaggerItem } from "@/components/motion"
 import { EmptyState } from "@/components/shared/empty-state"
 import { StatCardsSkeleton, TableSkeleton } from "@/components/shared/skeletons"
 import { StatCard } from "@/components/shared/stat-card"
@@ -50,118 +51,142 @@ function PaymentsView() {
         description="Review payments collected across completed trips."
       />
 
-      {isLoading ? (
-        <StatCardsSkeleton count={3} className="grid gap-4 sm:grid-cols-3" />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard
-            title="Revenue (all time)"
-            value={formatCurrency(revenue?.totalRevenue ?? 0)}
-            icon={BanknoteIcon}
-          />
-          <StatCard
-            title="Transactions (all time)"
-            value={revenue?.totalTransactions ?? 0}
-            icon={ReceiptIcon}
-          />
-          <StatCard
-            title="Collected (this page)"
-            value={formatCurrency(totalPaid)}
-            icon={CreditCardIcon}
-          />
-        </div>
-      )}
+      <ContentSwap stateKey={isLoading ? "loading" : "ready"}>
+        {isLoading ? (
+          <StatCardsSkeleton count={3} className="grid gap-4 sm:grid-cols-3" />
+        ) : (
+          <Stagger className="grid gap-4 sm:grid-cols-3">
+            <StaggerItem>
+              <StatCard
+                title="Revenue (all time)"
+                value={revenue?.totalRevenue ?? 0}
+                icon={BanknoteIcon}
+                format={formatCurrency}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <StatCard
+                title="Transactions (all time)"
+                value={revenue?.totalTransactions ?? 0}
+                icon={ReceiptIcon}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <StatCard
+                title="Collected (this page)"
+                value={totalPaid}
+                icon={CreditCardIcon}
+                format={formatCurrency}
+              />
+            </StaggerItem>
+          </Stagger>
+        )}
+      </ContentSwap>
 
       <div className="mt-4">
         <Card>
           <CardContent className="p-0">
-            {isLoading && <TableSkeleton columns={7} />}
+            <ContentSwap
+              stateKey={
+                isLoading
+                  ? "loading"
+                  : isError
+                    ? "error"
+                    : data && data.result.length === 0
+                      ? "empty"
+                      : "ready"
+              }
+            >
+              {isLoading && <TableSkeleton columns={7} />}
 
-            {!isLoading && isError && (
-              <div className="p-6">
-                <EmptyState
-                  icon={CreditCardIcon}
-                  title="Could not load payments"
-                  description="Please try refreshing the page."
-                />
-              </div>
-            )}
-
-            {!isLoading && !isError && data && data.result.length === 0 && (
-              <div className="p-6">
-                <EmptyState
-                  icon={CreditCardIcon}
-                  title="No trips yet"
-                  description="Payments from completed trips will appear here."
-                />
-              </div>
-            )}
-
-            {!isLoading && !isError && data && data.result.length > 0 && (
-              <>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Trip</TableHead>
-                      <TableHead>Patient</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Paid</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.result.map((trip) => (
-                      <TableRow key={trip.id}>
-                        <TableCell className="font-mono text-xs">
-                          {shortId(trip.id)}
-                        </TableCell>
-                        <TableCell>{trip.patientName}</TableCell>
-                        <TableCell>
-                          {trip.payment
-                            ? formatCurrency(trip.payment.amount)
-                            : "—"}
-                        </TableCell>
-                        <TableCell>{trip.payment?.method ?? "—"}</TableCell>
-                        <TableCell>
-                          {trip.payment ? (
-                            <PaymentStatusBadge status={trip.payment.status} />
-                          ) : (
-                            "—"
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {trip.payment?.paidAt
-                            ? formatDateTime(trip.payment.paidAt)
-                            : "—"}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            render={
-                              <Link
-                                href={`${ADMIN_ROUTES.requests}/${trip.id}`}
-                              />
-                            }
-                          >
-                            View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <div className="border-t p-4">
-                  <TablePagination
-                    page={data.meta.page}
-                    totalPages={data.meta.totalPages}
-                    onPageChange={(next) => navigate({ page: next })}
+              {!isLoading && isError && (
+                <div className="p-6">
+                  <EmptyState
+                    icon={CreditCardIcon}
+                    title="Could not load payments"
+                    description="Please try refreshing the page."
                   />
                 </div>
-              </>
-            )}
+              )}
+
+              {!isLoading && !isError && data && data.result.length === 0 && (
+                <div className="p-6">
+                  <EmptyState
+                    icon={CreditCardIcon}
+                    title="No trips yet"
+                    description="Payments from completed trips will appear here."
+                  />
+                </div>
+              )}
+
+              {!isLoading && !isError && data && data.result.length > 0 && (
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Trip</TableHead>
+                        <TableHead>Patient</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Method</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Paid</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {data.result.map((trip) => (
+                        <TableRow key={trip.id}>
+                          <TableCell className="font-mono text-xs">
+                            {shortId(trip.id)}
+                          </TableCell>
+                          <TableCell>{trip.patientName}</TableCell>
+                          <TableCell>
+                            {trip.payment
+                              ? formatCurrency(trip.payment.amount)
+                              : "—"}
+                          </TableCell>
+                          <TableCell>{trip.payment?.method ?? "—"}</TableCell>
+                          <TableCell>
+                            {trip.payment ? (
+                              <PaymentStatusBadge
+                                status={trip.payment.status}
+                              />
+                            ) : (
+                              "—"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {trip.payment?.paidAt
+                              ? formatDateTime(trip.payment.paidAt)
+                              : "—"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              render={
+                                <Link
+                                  href={`${ADMIN_ROUTES.requests}/${trip.id}`}
+                                />
+                              }
+                            >
+                              View
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <div className="border-t p-4">
+                    <TablePagination
+                      page={data.meta.page}
+                      totalPages={data.meta.totalPages}
+                      onPageChange={(next) => navigate({ page: next })}
+                    />
+                  </div>
+                </>
+              )}
+            </ContentSwap>
           </CardContent>
         </Card>
       </div>
