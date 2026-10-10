@@ -1,6 +1,7 @@
 "use client"
 
 import { MenuIcon, XIcon } from "lucide-react"
+import { AnimatePresence, motion } from "motion/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -42,13 +43,20 @@ export function Header() {
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
+                "relative rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
                 pathname === item.href
                   ? "text-foreground"
                   : "text-muted-foreground",
               )}
             >
               {item.title}
+              {pathname === item.href && (
+                <motion.span
+                  layoutId="nav-active"
+                  className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-red-600"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
             </Link>
           ))}
         </nav>
@@ -83,57 +91,65 @@ export function Header() {
           )}
         </button>
       </div>
-
-      {open && (
-        <div className="border-t bg-background md:hidden">
-          <nav className="flex flex-col gap-1 px-4 py-3">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  "rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
-                  pathname === item.href
-                    ? "bg-accent text-foreground"
-                    : "text-muted-foreground",
-                )}
-              >
-                {item.title}
-              </Link>
-            ))}
-            <div className="mt-2 flex gap-2">
-              {showDashboard ? (
-                <Button
-                  size="sm"
-                  className="flex-1"
-                  render={<Link href={roleHome(role)} />}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden border-t bg-background md:hidden"
+          >
+            <nav className="flex flex-col gap-1 px-4 py-3">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
+                    pathname === item.href
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground",
+                  )}
                 >
-                  Dashboard
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    render={<Link href="/login" />}
-                  >
-                    Log in
-                  </Button>
+                  {item.title}
+                </Link>
+              ))}
+              <div className="mt-2 flex gap-2">
+                {showDashboard ? (
                   <Button
                     size="sm"
                     className="flex-1"
-                    render={<Link href="/register" />}
+                    render={<Link href={roleHome(role)} />}
                   >
-                    Get Started
+                    Dashboard
                   </Button>
-                </>
-              )}
-            </div>
-          </nav>
-        </div>
-      )}
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      render={<Link href="/login" />}
+                    >
+                      Log in
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="flex-1"
+                      render={<Link href="/register" />}
+                    >
+                      Get Started
+                    </Button>
+                  </>
+                )}
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }

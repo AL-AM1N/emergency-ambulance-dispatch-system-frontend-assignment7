@@ -10,6 +10,7 @@ import {
   ShieldCheckIcon,
   UserRoundIcon,
 } from "lucide-react"
+import { motion } from "motion/react"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "react-hot-toast"
@@ -22,6 +23,7 @@ import { Separator } from "@/components/ui/separator"
 import { useGoogleLogin, useLogin } from "@/hooks"
 import { roleHome, tokenToRole } from "@/lib/auth"
 import { attemptDemoLogin } from "@/lib/demo"
+import { springSoft } from "@/lib/motion"
 import type { DemoRole } from "@/types"
 import { loginSchema } from "@/validation"
 
@@ -237,21 +239,27 @@ export function LoginForm() {
             {demoOptions.map((option) => {
               const Icon = option.icon
               return (
-                <Button
+                <motion.div
                   key={option.role}
-                  variant="ghost"
-                  title={option.description}
-                  className="h-auto flex-col gap-1.5 border border-white/30 bg-white/20 py-3 text-foreground shadow-sm backdrop-blur-md hover:bg-white/30 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
-                  disabled={demoLoading !== null}
-                  onClick={() => void handleDemoLogin(option.role)}
+                  whileHover={{ y: -2, scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={springSoft}
                 >
-                  {demoLoading === option.role ? (
-                    <Loader2Icon className="size-4 animate-spin" />
-                  ) : (
-                    <Icon className="size-4 text-red-600" />
-                  )}
-                  <span className="text-xs font-medium">{option.label}</span>
-                </Button>
+                  <Button
+                    variant="ghost"
+                    title={option.description}
+                    className="h-full w-full flex-col gap-1.5 border border-white/30 bg-white/20 py-3 text-foreground shadow-sm backdrop-blur-md hover:bg-white/30 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                    disabled={demoLoading !== null}
+                    onClick={() => void handleDemoLogin(option.role)}
+                  >
+                    {demoLoading === option.role ? (
+                      <Loader2Icon className="size-4 animate-spin" />
+                    ) : (
+                      <Icon className="size-4 text-red-600" />
+                    )}
+                    <span className="text-xs font-medium">{option.label}</span>
+                  </Button>
+                </motion.div>
               )
             })}
           </div>

@@ -12,6 +12,7 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { EmergencyStrip } from "@/components/landing/emergency-strip"
+import { FadeIn, Stagger, StaggerItem } from "@/components/motion"
 import { Button } from "@/components/ui/button"
 
 const services = [
@@ -75,21 +76,25 @@ export default function HomePage() {
           className="object-cover -z-10"
         />
         <div className="mx-auto flex min-h-[80vh] max-w-6xl items-center px-4 py-20 lg:py-28">
-          <div className="max-w-xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary bg-background px-4 py-1.5 text-sm font-medium text-muted-foreground">
+          <Stagger className="max-w-xl" stagger={0.12}>
+            <StaggerItem className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary bg-background px-4 py-1.5 text-sm font-medium text-muted-foreground">
               <BadgeCheckIcon className="size-4 text-red-600" />
               Trusted Emergency Dispatch Platform
-            </div>
-            <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
-              Emergency care,
-              <span className="text-red-600"> dispatched in minutes.</span>
-            </h1>
-            <p className="mt-6 max-w-2xl text-sm text-muted-foreground">
-              AmbuLink connects you with the nearest available ambulance, live
-              tracking, and priority handling — so you can focus on what matters
-              most.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            </StaggerItem>
+            <StaggerItem>
+              <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+                Emergency care,
+                <span className="text-red-600"> dispatched in minutes.</span>
+              </h1>
+            </StaggerItem>
+            <StaggerItem>
+              <p className="mt-6 max-w-2xl text-sm text-muted-foreground">
+                AmbuLink connects you with the nearest available ambulance, live
+                tracking, and priority handling — so you can focus on what
+                matters most.
+              </p>
+            </StaggerItem>
+            <StaggerItem className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
                 size="lg"
                 className="w-full sm:w-auto"
@@ -107,8 +112,8 @@ export default function HomePage() {
                 Explore Services
                 <ArrowRightIcon className="size-4" />
               </Button>
-            </div>
-          </div>
+            </StaggerItem>
+          </Stagger>
         </div>
       </section>
 
@@ -119,18 +124,19 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-20">
-        <div className="mb-10 max-w-2xl">
+        <FadeIn inView className="mb-10 max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-red-600">
             What we do
           </p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight">
             Complete emergency response, end to end
           </h2>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        </FadeIn>
+        <Stagger inView className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service) => (
-            <div
+            <StaggerItem
               key={service.title}
+              hoverLift
               className="flex flex-col gap-3 rounded-xl border bg-card p-6"
             >
               <div className="flex size-11 items-center justify-center rounded-lg bg-red-50 text-red-600">
@@ -140,24 +146,28 @@ export default function HomePage() {
               <p className="text-sm text-muted-foreground">
                 {service.description}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </section>
 
       <section className="bg-card">
         <div className="mx-auto max-w-6xl px-4 py-20">
-          <div className="mx-auto max-w-2xl text-center">
+          <FadeIn inView className="mx-auto max-w-2xl text-center">
             <p className="text-sm font-semibold uppercase tracking-wide text-red-600">
               How it works
             </p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight">
               From call to care in three steps
             </h2>
-          </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
+          </FadeIn>
+          <Stagger inView className="mt-10 grid gap-6 md:grid-cols-3">
             {steps.map((step) => (
-              <div key={step.number} className="relative rounded-xl border p-6">
+              <StaggerItem
+                key={step.number}
+                hoverLift
+                className="relative rounded-xl border p-6"
+              >
                 <p className="text-4xl font-black text-red-100">
                   {step.number}
                 </p>
@@ -165,9 +175,9 @@ export default function HomePage() {
                 <p className="mt-2 text-sm text-muted-foreground">
                   {step.description}
                 </p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </div>
       </section>
 
@@ -193,8 +203,8 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-20">
-        <div className="grid gap-8 md:grid-cols-3">
-          <div className="flex items-center gap-4">
+        <Stagger inView className="grid gap-8 md:grid-cols-3">
+          <StaggerItem className="flex items-center gap-4">
             <div className="flex size-12 items-center justify-center rounded-lg bg-red-50 text-red-600">
               <ActivityIcon className="size-6" />
             </div>
@@ -202,8 +212,8 @@ export default function HomePage() {
               <p className="text-2xl font-bold">24/7</p>
               <p className="text-sm text-muted-foreground">Always available</p>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
+          </StaggerItem>
+          <StaggerItem className="flex items-center gap-4">
             <div className="flex size-12 items-center justify-center rounded-lg bg-red-50 text-red-600">
               <Clock3Icon className="size-6" />
             </div>
@@ -213,8 +223,8 @@ export default function HomePage() {
                 Average request time
               </p>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
+          </StaggerItem>
+          <StaggerItem className="flex items-center gap-4">
             <div className="flex size-12 items-center justify-center rounded-lg bg-red-50 text-red-600">
               <RadioIcon className="size-6" />
             </div>
@@ -224,8 +234,8 @@ export default function HomePage() {
                 Live trip tracking
               </p>
             </div>
-          </div>
-        </div>
+          </StaggerItem>
+        </Stagger>
       </section>
     </div>
   )
