@@ -51,15 +51,35 @@ function buildUrl(path: string, params?: ApiClientOptions["params"]): string {
 
 function toError(error: unknown): ApiClientError {
   const fetchError = error as FetchError
+  const response = fetchError?.response
+
+  if (!response) {
+    return {
+      status: 0,
+      message:
+        "Can't reach the server. Please check your connection and try again.",
+    }
+  }
+
   const status =
-    fetchError?.statusCode ??
-    fetchError?.status ??
-    fetchError?.response?.status ??
-    500
-  const envelope = fetchError?.data as { message?: string } | undefined
+    fetchError?.statusCode ?? fetchError?.status ?? response.status ?? 500
+
+  const envelope = fetchError?.data as
+    | { message?: string | string[] }
+    | undefined
+
+  const envelopeMessage = Array.isArray(envelope?.message)
+    ? envelope.message.join(", ")
+    : envelope?.message
+
+  const fallback =
+    status >= 500
+      ? "The server ran into a problem. Please try again shortly."
+      : "Something went wrong with your request."
+
   return {
     status,
-    message: envelope?.message ?? fetchError?.message ?? "Something went wrong",
+    message: envelopeMessage ?? fallback,
     data: fetchError?.data,
   }
 }
