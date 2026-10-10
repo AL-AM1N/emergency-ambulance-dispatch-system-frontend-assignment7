@@ -73,9 +73,13 @@ export default function HomePage() {
           fill
           priority
           sizes="100vw"
-          className="object-cover -z-10"
+          className="-z-20 object-cover object-[78%_50%] sm:object-[70%_50%] lg:object-center"
         />
-        <div className="mx-auto flex min-h-[80vh] max-w-6xl items-center px-4 py-20 lg:py-28">
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-gradient-to-r from-background via-background/90 to-background/40 md:hidden"
+        />
+        <div className="mx-auto flex min-h-[80svh] max-w-6xl items-center px-4 py-20 lg:py-28">
           <Stagger className="max-w-xl" stagger={0.12}>
             <StaggerItem className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary bg-background px-4 py-1.5 text-sm font-medium text-muted-foreground">
               <BadgeCheckIcon className="size-4 text-red-600" />
