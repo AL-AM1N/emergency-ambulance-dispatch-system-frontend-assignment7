@@ -11,6 +11,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
+import { ContentSwap } from "@/components/motion"
 import { EmptyState } from "@/components/shared/empty-state"
 import { TableSkeleton } from "@/components/shared/skeletons"
 import TablePagination from "@/components/shared/table-pagination"
@@ -198,118 +199,132 @@ function DriversView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && <TableSkeleton columns={6} />}
+          <ContentSwap
+            stateKey={
+              isLoading
+                ? "loading"
+                : isError
+                  ? "error"
+                  : drivers.length === 0
+                    ? "empty"
+                    : "ready"
+            }
+          >
+            {isLoading && <TableSkeleton columns={6} />}
 
-          {!isLoading && isError && (
-            <div className="p-6">
-              <EmptyState
-                icon={UsersIcon}
-                title="Could not load drivers"
-                description="Please try refreshing the page."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && drivers.length === 0 && (
-            <div className="p-6">
-              <EmptyState
-                icon={UsersIcon}
-                title="No drivers found"
-                description="Drivers who register on the platform will appear here."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && drivers.length > 0 && (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Vehicle</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Available</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {drivers.map((driver) => (
-                    <TableRow key={driver.id}>
-                      <TableCell>
-                        <div className="space-y-0.5">
-                          <p className="font-medium">{driver.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {driver.email}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {driver.vehicleNumber}
-                      </TableCell>
-                      <TableCell>
-                        {driver.ambulanceType.replace("_", " ") ?? "—"}
-                      </TableCell>
-                      <TableCell>
-                        <DriverStatusBadge
-                          status={driver.user?.status ?? "ACTIVE"}
-                        />
-                      </TableCell>
-                      <TableCell>{driver.isAvailable ? "Yes" : "No"}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label="Edit driver"
-                            onClick={() => setEditing(driver)}
-                          >
-                            <PencilIcon className="size-4" />
-                          </Button>
-                          {(driver.user?.status ?? "ACTIVE") === "ACTIVE" ? (
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              aria-label="Block driver"
-                              onClick={() =>
-                                updateStatus.mutate({
-                                  id: driver.id,
-                                  status: "BLOCKED",
-                                })
-                              }
-                            >
-                              <ShieldBanIcon className="size-4 text-rose-600" />
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              aria-label="Activate driver"
-                              onClick={() =>
-                                updateStatus.mutate({
-                                  id: driver.id,
-                                  status: "ACTIVE",
-                                })
-                              }
-                            >
-                              <ShieldCheckIcon className="size-4 text-emerald-600" />
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className="border-t p-4">
-                <TablePagination
-                  page={data?.meta.page ?? 1}
-                  totalPages={data?.meta.totalPages ?? 1}
-                  onPageChange={(next) => navigate({ page: next })}
+            {!isLoading && isError && (
+              <div className="p-6">
+                <EmptyState
+                  icon={UsersIcon}
+                  title="Could not load drivers"
+                  description="Please try refreshing the page."
                 />
               </div>
-            </>
-          )}
+            )}
+
+            {!isLoading && !isError && drivers.length === 0 && (
+              <div className="p-6">
+                <EmptyState
+                  icon={UsersIcon}
+                  title="No drivers found"
+                  description="Drivers who register on the platform will appear here."
+                />
+              </div>
+            )}
+
+            {!isLoading && !isError && drivers.length > 0 && (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Driver</TableHead>
+                      <TableHead>Vehicle</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Available</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {drivers.map((driver) => (
+                      <TableRow key={driver.id}>
+                        <TableCell>
+                          <div className="space-y-0.5">
+                            <p className="font-medium">{driver.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {driver.email}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {driver.vehicleNumber}
+                        </TableCell>
+                        <TableCell>
+                          {driver.ambulanceType.replace("_", " ") ?? "—"}
+                        </TableCell>
+                        <TableCell>
+                          <DriverStatusBadge
+                            status={driver.user?.status ?? "ACTIVE"}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {driver.isAvailable ? "Yes" : "No"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label="Edit driver"
+                              onClick={() => setEditing(driver)}
+                            >
+                              <PencilIcon className="size-4" />
+                            </Button>
+                            {(driver.user?.status ?? "ACTIVE") === "ACTIVE" ? (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label="Block driver"
+                                onClick={() =>
+                                  updateStatus.mutate({
+                                    id: driver.id,
+                                    status: "BLOCKED",
+                                  })
+                                }
+                              >
+                                <ShieldBanIcon className="size-4 text-rose-600" />
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label="Activate driver"
+                                onClick={() =>
+                                  updateStatus.mutate({
+                                    id: driver.id,
+                                    status: "ACTIVE",
+                                  })
+                                }
+                              >
+                                <ShieldCheckIcon className="size-4 text-emerald-600" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="border-t p-4">
+                  <TablePagination
+                    page={data?.meta.page ?? 1}
+                    totalPages={data?.meta.totalPages ?? 1}
+                    onPageChange={(next) => navigate({ page: next })}
+                  />
+                </div>
+              </>
+            )}
+          </ContentSwap>
         </CardContent>
       </Card>
 

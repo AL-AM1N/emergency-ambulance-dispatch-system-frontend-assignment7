@@ -11,6 +11,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
+import { ContentSwap } from "@/components/motion"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { EmptyState } from "@/components/shared/empty-state"
 import { TableSkeleton } from "@/components/shared/skeletons"
@@ -287,93 +288,106 @@ function AmbulancesView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && <TableSkeleton columns={6} />}
+          <ContentSwap
+            stateKey={
+              isLoading
+                ? "loading"
+                : isError
+                  ? "error"
+                  : ambulances.length === 0
+                    ? "empty"
+                    : "ready"
+            }
+          >
+            {isLoading && <TableSkeleton columns={6} />}
 
-          {!isLoading && isError && (
-            <div className="p-6">
-              <EmptyState
-                icon={AmbulanceIcon}
-                title="Could not load ambulances"
-                description="Please try refreshing the page."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && ambulances.length === 0 && (
-            <div className="p-6">
-              <EmptyState
-                icon={AmbulanceIcon}
-                title="No ambulances found"
-                description="Add your first ambulance to start dispatching."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && ambulances.length > 0 && (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Vehicle</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Added</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {ambulances.map((ambulance) => (
-                    <TableRow key={ambulance.id}>
-                      <TableCell className="font-medium">
-                        <span className="flex items-center gap-2">
-                          <AmbulanceIcon className="size-4 text-muted-foreground" />
-                          {ambulance.vehicleNumber}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {ambulance.ambulanceType?.name.replace("_", " ") ?? "—"}
-                      </TableCell>
-                      <TableCell>
-                        <AmbulanceStatusBadge status={ambulance.status} />
-                      </TableCell>
-                      <TableCell>{ambulance.driver?.name ?? "—"}</TableCell>
-                      <TableCell>
-                        {new Date(ambulance.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label="Edit ambulance"
-                            onClick={() => setEditing(ambulance)}
-                          >
-                            <PencilIcon className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label="Delete ambulance"
-                            onClick={() => setDeleting(ambulance)}
-                          >
-                            <Trash2Icon className="size-4 text-rose-600" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className="border-t p-4">
-                <TablePagination
-                  page={data?.meta.page ?? 1}
-                  totalPages={data?.meta.totalPages ?? 1}
-                  onPageChange={(next) => navigate({ page: next })}
+            {!isLoading && isError && (
+              <div className="p-6">
+                <EmptyState
+                  icon={AmbulanceIcon}
+                  title="Could not load ambulances"
+                  description="Please try refreshing the page."
                 />
               </div>
-            </>
-          )}
+            )}
+
+            {!isLoading && !isError && ambulances.length === 0 && (
+              <div className="p-6">
+                <EmptyState
+                  icon={AmbulanceIcon}
+                  title="No ambulances found"
+                  description="Add your first ambulance to start dispatching."
+                />
+              </div>
+            )}
+
+            {!isLoading && !isError && ambulances.length > 0 && (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Vehicle</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Driver</TableHead>
+                      <TableHead>Added</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ambulances.map((ambulance) => (
+                      <TableRow key={ambulance.id}>
+                        <TableCell className="font-medium">
+                          <span className="flex items-center gap-2">
+                            <AmbulanceIcon className="size-4 text-muted-foreground" />
+                            {ambulance.vehicleNumber}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {ambulance.ambulanceType?.name.replace("_", " ") ??
+                            "—"}
+                        </TableCell>
+                        <TableCell>
+                          <AmbulanceStatusBadge status={ambulance.status} />
+                        </TableCell>
+                        <TableCell>{ambulance.driver?.name ?? "—"}</TableCell>
+                        <TableCell>
+                          {new Date(ambulance.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label="Edit ambulance"
+                              onClick={() => setEditing(ambulance)}
+                            >
+                              <PencilIcon className="size-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label="Delete ambulance"
+                              onClick={() => setDeleting(ambulance)}
+                            >
+                              <Trash2Icon className="size-4 text-rose-600" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="border-t p-4">
+                  <TablePagination
+                    page={data?.meta.page ?? 1}
+                    totalPages={data?.meta.totalPages ?? 1}
+                    onPageChange={(next) => navigate({ page: next })}
+                  />
+                </div>
+              </>
+            )}
+          </ContentSwap>
         </CardContent>
       </Card>
 

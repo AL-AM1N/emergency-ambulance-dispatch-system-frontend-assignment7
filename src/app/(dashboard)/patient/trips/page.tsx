@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
+import { ContentSwap } from "@/components/motion"
 import { EmptyState } from "@/components/shared/empty-state"
 import { TableSkeleton } from "@/components/shared/skeletons"
 import { TripStatusBadge } from "@/components/shared/status-badge"
@@ -74,99 +75,116 @@ function TripsView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && <TableSkeleton columns={7} />}
+          <ContentSwap
+            stateKey={
+              isLoading
+                ? "loading"
+                : isError
+                  ? "error"
+                  : data && data.result.length === 0
+                    ? "empty"
+                    : "ready"
+            }
+          >
+            {isLoading && <TableSkeleton columns={7} />}
 
-          {!isLoading && isError && (
-            <div className="p-6">
-              <EmptyState
-                icon={SirenIcon}
-                title="Could not load trips"
-                description="Please try refreshing the page."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && data && data.result.length === 0 && (
-            <div className="p-6">
-              <EmptyState
-                icon={SirenIcon}
-                title="No trips found"
-                description="Your ambulance trips will appear here once dispatched."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && data && data.result.length > 0 && (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Emergency</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Fare</TableHead>
-                    <TableHead>Completed</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.result.map((trip) => (
-                    <TableRow key={trip.id}>
-                      <TableCell className="font-mono text-xs">
-                        {shortId(trip.id)}
-                      </TableCell>
-                      <TableCell>
-                        {trip.emergencyType.replace("_", " ")}
-                      </TableCell>
-                      <TableCell>
-                        <TripStatusBadge status={trip.status} />
-                      </TableCell>
-                      <TableCell>{trip.driver?.name ?? "—"}</TableCell>
-                      <TableCell>{formatCurrency(trip.fare)}</TableCell>
-                      <TableCell>{formatDateTime(trip.completedAt)}</TableCell>
-                      <TableCell className="flex justify-end gap-1">
-                        {trip.status === "COMPLETED" &&
-                          Boolean(trip.fare) &&
-                          !(
-                            trip.payment && trip.payment.status === "COMPLETED"
-                          ) && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              render={
-                                <Link
-                                  href={`${PATIENT_ROUTES.payment}?tripId=${trip.id}`}
-                                />
-                              }
-                            >
-                              <BanknoteIcon className="size-4" />
-                              Pay
-                            </Button>
-                          )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          render={
-                            <Link href={`${PATIENT_ROUTES.trips}/${trip.id}`} />
-                          }
-                        >
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className="border-t p-4">
-                <TablePagination
-                  page={data.meta.page}
-                  totalPages={data.meta.totalPages}
-                  onPageChange={(next) => navigate({ page: next })}
+            {!isLoading && isError && (
+              <div className="p-6">
+                <EmptyState
+                  icon={SirenIcon}
+                  title="Could not load trips"
+                  description="Please try refreshing the page."
                 />
               </div>
-            </>
-          )}
+            )}
+
+            {!isLoading && !isError && data && data.result.length === 0 && (
+              <div className="p-6">
+                <EmptyState
+                  icon={SirenIcon}
+                  title="No trips found"
+                  description="Your ambulance trips will appear here once dispatched."
+                />
+              </div>
+            )}
+
+            {!isLoading && !isError && data && data.result.length > 0 && (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Emergency</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Driver</TableHead>
+                      <TableHead>Fare</TableHead>
+                      <TableHead>Completed</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.result.map((trip) => (
+                      <TableRow key={trip.id}>
+                        <TableCell className="font-mono text-xs">
+                          {shortId(trip.id)}
+                        </TableCell>
+                        <TableCell>
+                          {trip.emergencyType.replace("_", " ")}
+                        </TableCell>
+                        <TableCell>
+                          <TripStatusBadge status={trip.status} />
+                        </TableCell>
+                        <TableCell>{trip.driver?.name ?? "—"}</TableCell>
+                        <TableCell>{formatCurrency(trip.fare)}</TableCell>
+                        <TableCell>
+                          {formatDateTime(trip.completedAt)}
+                        </TableCell>
+                        <TableCell className="flex justify-end gap-1">
+                          {trip.status === "COMPLETED" &&
+                            Boolean(trip.fare) &&
+                            !(
+                              trip.payment &&
+                              trip.payment.status === "COMPLETED"
+                            ) && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                render={
+                                  <Link
+                                    href={`${PATIENT_ROUTES.payment}?tripId=${trip.id}`}
+                                  />
+                                }
+                              >
+                                <BanknoteIcon className="size-4" />
+                                Pay
+                              </Button>
+                            )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            render={
+                              <Link
+                                href={`${PATIENT_ROUTES.trips}/${trip.id}`}
+                              />
+                            }
+                          >
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="border-t p-4">
+                  <TablePagination
+                    page={data.meta.page}
+                    totalPages={data.meta.totalPages}
+                    onPageChange={(next) => navigate({ page: next })}
+                  />
+                </div>
+              </>
+            )}
+          </ContentSwap>
         </CardContent>
       </Card>
     </div>

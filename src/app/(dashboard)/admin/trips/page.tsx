@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
+import { ContentSwap } from "@/components/motion"
 import { EmptyState } from "@/components/shared/empty-state"
 import { TableSkeleton } from "@/components/shared/skeletons"
 import { TripStatusBadge } from "@/components/shared/status-badge"
@@ -74,81 +75,93 @@ function TripsView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && <TableSkeleton columns={7} />}
+          <ContentSwap
+            stateKey={
+              isLoading
+                ? "loading"
+                : isError
+                  ? "error"
+                  : data && data.result.length === 0
+                    ? "empty"
+                    : "ready"
+            }
+          >
+            {isLoading && <TableSkeleton columns={7} />}
 
-          {!isLoading && isError && (
-            <div className="p-6">
-              <EmptyState
-                icon={RouteIcon}
-                title="Could not load trips"
-                description="Please try refreshing the page."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && data && data.result.length === 0 && (
-            <div className="p-6">
-              <EmptyState
-                icon={RouteIcon}
-                title="No trips found"
-                description="Trips will appear here once requests are assigned."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && data && data.result.length > 0 && (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Fare</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.result.map((trip) => (
-                    <TableRow key={trip.id}>
-                      <TableCell className="font-mono text-xs">
-                        {shortId(trip.id)}
-                      </TableCell>
-                      <TableCell>{trip.patientName}</TableCell>
-                      <TableCell>{trip.driver?.name ?? "—"}</TableCell>
-                      <TableCell>
-                        <TripStatusBadge status={trip.status} />
-                      </TableCell>
-                      <TableCell>{formatCurrency(trip.fare)}</TableCell>
-                      <TableCell>{formatDateTime(trip.createdAt)}</TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          render={
-                            <Link
-                              href={`${ADMIN_ROUTES.requests}/${trip.id}`}
-                            />
-                          }
-                        >
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className="border-t p-4">
-                <TablePagination
-                  page={data.meta.page}
-                  totalPages={data.meta.totalPages}
-                  onPageChange={(next) => navigate({ page: next })}
+            {!isLoading && isError && (
+              <div className="p-6">
+                <EmptyState
+                  icon={RouteIcon}
+                  title="Could not load trips"
+                  description="Please try refreshing the page."
                 />
               </div>
-            </>
-          )}
+            )}
+
+            {!isLoading && !isError && data && data.result.length === 0 && (
+              <div className="p-6">
+                <EmptyState
+                  icon={RouteIcon}
+                  title="No trips found"
+                  description="Trips will appear here once requests are assigned."
+                />
+              </div>
+            )}
+
+            {!isLoading && !isError && data && data.result.length > 0 && (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Patient</TableHead>
+                      <TableHead>Driver</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Fare</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.result.map((trip) => (
+                      <TableRow key={trip.id}>
+                        <TableCell className="font-mono text-xs">
+                          {shortId(trip.id)}
+                        </TableCell>
+                        <TableCell>{trip.patientName}</TableCell>
+                        <TableCell>{trip.driver?.name ?? "—"}</TableCell>
+                        <TableCell>
+                          <TripStatusBadge status={trip.status} />
+                        </TableCell>
+                        <TableCell>{formatCurrency(trip.fare)}</TableCell>
+                        <TableCell>{formatDateTime(trip.createdAt)}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            render={
+                              <Link
+                                href={`${ADMIN_ROUTES.requests}/${trip.id}`}
+                              />
+                            }
+                          >
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="border-t p-4">
+                  <TablePagination
+                    page={data.meta.page}
+                    totalPages={data.meta.totalPages}
+                    onPageChange={(next) => navigate({ page: next })}
+                  />
+                </div>
+              </>
+            )}
+          </ContentSwap>
         </CardContent>
       </Card>
     </div>

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
+import { ContentSwap } from "@/components/motion"
 import { EmptyState } from "@/components/shared/empty-state"
 import { TableSkeleton } from "@/components/shared/skeletons"
 import {
@@ -110,87 +111,101 @@ function RequestsView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && <TableSkeleton columns={7} />}
+          <ContentSwap
+            stateKey={
+              isLoading
+                ? "loading"
+                : isError
+                  ? "error"
+                  : data && data.result.length === 0
+                    ? "empty"
+                    : "ready"
+            }
+          >
+            {isLoading && <TableSkeleton columns={7} />}
 
-          {!isLoading && isError && (
-            <div className="p-6">
-              <EmptyState
-                icon={SirenIcon}
-                title="Could not load requests"
-                description="Please try refreshing the page."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && data && data.result.length === 0 && (
-            <div className="p-6">
-              <EmptyState
-                icon={SirenIcon}
-                title="No requests found"
-                description="Try changing your filters, or create a new request."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && data && data.result.length > 0 && (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Emergency</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Pickup location</TableHead>
-                    <TableHead>Requested</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.result.map((request) => (
-                    <TableRow key={request.id}>
-                      <TableCell className="font-mono text-xs">
-                        {shortId(request.id)}
-                      </TableCell>
-                      <TableCell>
-                        {request.emergencyType.replace("_", " ")}
-                      </TableCell>
-                      <TableCell>
-                        <PriorityBadge priority={request.priority} />
-                      </TableCell>
-                      <TableCell>
-                        <TripStatusBadge status={request.status} />
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {request.pickupLocation}
-                      </TableCell>
-                      <TableCell>{formatDateTime(request.createdAt)}</TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          render={
-                            <Link
-                              href={`${PATIENT_ROUTES.requests}/${request.id}`}
-                            />
-                          }
-                        >
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className="border-t p-4">
-                <TablePagination
-                  page={data.meta.page}
-                  totalPages={data.meta.totalPages}
-                  onPageChange={(next) => navigate({ page: next })}
+            {!isLoading && isError && (
+              <div className="p-6">
+                <EmptyState
+                  icon={SirenIcon}
+                  title="Could not load requests"
+                  description="Please try refreshing the page."
                 />
               </div>
-            </>
-          )}
+            )}
+
+            {!isLoading && !isError && data && data.result.length === 0 && (
+              <div className="p-6">
+                <EmptyState
+                  icon={SirenIcon}
+                  title="No requests found"
+                  description="Try changing your filters, or create a new request."
+                />
+              </div>
+            )}
+
+            {!isLoading && !isError && data && data.result.length > 0 && (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Emergency</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Pickup location</TableHead>
+                      <TableHead>Requested</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.result.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell className="font-mono text-xs">
+                          {shortId(request.id)}
+                        </TableCell>
+                        <TableCell>
+                          {request.emergencyType.replace("_", " ")}
+                        </TableCell>
+                        <TableCell>
+                          <PriorityBadge priority={request.priority} />
+                        </TableCell>
+                        <TableCell>
+                          <TripStatusBadge status={request.status} />
+                        </TableCell>
+                        <TableCell className="max-w-[200px] truncate">
+                          {request.pickupLocation}
+                        </TableCell>
+                        <TableCell>
+                          {formatDateTime(request.createdAt)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            render={
+                              <Link
+                                href={`${PATIENT_ROUTES.requests}/${request.id}`}
+                              />
+                            }
+                          >
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="border-t p-4">
+                  <TablePagination
+                    page={data.meta.page}
+                    totalPages={data.meta.totalPages}
+                    onPageChange={(next) => navigate({ page: next })}
+                  />
+                </div>
+              </>
+            )}
+          </ContentSwap>
         </CardContent>
       </Card>
     </div>

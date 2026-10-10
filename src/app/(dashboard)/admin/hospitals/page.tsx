@@ -11,6 +11,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
 import { DashboardSkeleton, PageHeader } from "@/components/dashboard"
+import { ContentSwap } from "@/components/motion"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { EmptyState } from "@/components/shared/empty-state"
 import { TableSkeleton } from "@/components/shared/skeletons"
@@ -266,84 +267,96 @@ function HospitalsView() {
 
       <Card>
         <CardContent className="p-0">
-          {isLoading && <TableSkeleton columns={5} />}
+          <ContentSwap
+            stateKey={
+              isLoading
+                ? "loading"
+                : isError
+                  ? "error"
+                  : hospitals.length === 0
+                    ? "empty"
+                    : "ready"
+            }
+          >
+            {isLoading && <TableSkeleton columns={5} />}
 
-          {!isLoading && isError && (
-            <div className="p-6">
-              <EmptyState
-                icon={Building2Icon}
-                title="Could not load hospitals"
-                description="Please try refreshing the page."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && hospitals.length === 0 && (
-            <div className="p-6">
-              <EmptyState
-                icon={Building2Icon}
-                title="No hospitals found"
-                description="Add your first partner hospital."
-              />
-            </div>
-          )}
-
-          {!isLoading && !isError && hospitals.length > 0 && (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {hospitals.map((hospital) => (
-                    <TableRow key={hospital.id}>
-                      <TableCell className="font-medium">
-                        {hospital.name}
-                      </TableCell>
-                      <TableCell>{hospital.type}</TableCell>
-                      <TableCell className="max-w-56 truncate">
-                        {hospital.address}
-                      </TableCell>
-                      <TableCell>{hospital.contactNumber ?? "—"}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label="Edit hospital"
-                            onClick={() => setEditing(hospital)}
-                          >
-                            <PencilIcon className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label="Delete hospital"
-                            onClick={() => setDeleting(hospital)}
-                          >
-                            <Trash2Icon className="size-4 text-rose-600" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className="border-t p-4">
-                <TablePagination
-                  page={data?.meta.page ?? 1}
-                  totalPages={data?.meta.totalPages ?? 1}
-                  onPageChange={(next) => navigate({ page: next })}
+            {!isLoading && isError && (
+              <div className="p-6">
+                <EmptyState
+                  icon={Building2Icon}
+                  title="Could not load hospitals"
+                  description="Please try refreshing the page."
                 />
               </div>
-            </>
-          )}
+            )}
+
+            {!isLoading && !isError && hospitals.length === 0 && (
+              <div className="p-6">
+                <EmptyState
+                  icon={Building2Icon}
+                  title="No hospitals found"
+                  description="Add your first partner hospital."
+                />
+              </div>
+            )}
+
+            {!isLoading && !isError && hospitals.length > 0 && (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Address</TableHead>
+                      <TableHead>Contact</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {hospitals.map((hospital) => (
+                      <TableRow key={hospital.id}>
+                        <TableCell className="font-medium">
+                          {hospital.name}
+                        </TableCell>
+                        <TableCell>{hospital.type}</TableCell>
+                        <TableCell className="max-w-56 truncate">
+                          {hospital.address}
+                        </TableCell>
+                        <TableCell>{hospital.contactNumber ?? "—"}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label="Edit hospital"
+                              onClick={() => setEditing(hospital)}
+                            >
+                              <PencilIcon className="size-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label="Delete hospital"
+                              onClick={() => setDeleting(hospital)}
+                            >
+                              <Trash2Icon className="size-4 text-rose-600" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="border-t p-4">
+                  <TablePagination
+                    page={data?.meta.page ?? 1}
+                    totalPages={data?.meta.totalPages ?? 1}
+                    onPageChange={(next) => navigate({ page: next })}
+                  />
+                </div>
+              </>
+            )}
+          </ContentSwap>
         </CardContent>
       </Card>
 
